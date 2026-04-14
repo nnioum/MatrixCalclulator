@@ -16,7 +16,7 @@ class MatrixApp(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Матричный калькулятор PRO")
-        self.resize(1200, 800)
+        self.resize(1200, 900)
 
         self.tabs = QTabWidget()
         self.setCentralWidget(self.tabs)
@@ -65,16 +65,16 @@ class MatrixApp(QMainWindow):
         self.cb = QLineEdit("3")
 
         for w in [self.ra, self.ca, self.rb, self.cb]:
-            w.setValidator(QIntValidator(1, 5))
+            w.setValidator(QIntValidator(1, 5));
             w.setFixedWidth(50)
             w.textChanged.connect(self.update_size)
 
-        size.addWidget(QLabel("Матрица A:"))
+        size.addWidget(QLabel("Матрица A:"));
         size.addWidget(self.ra);
         size.addWidget(QLabel("x"));
         size.addWidget(self.ca)
         size.addSpacing(20)
-        size.addWidget(QLabel("Матрица B:"))
+        size.addWidget(QLabel("Матрица B:"));
         size.addWidget(self.rb);
         size.addWidget(QLabel("x"));
         size.addWidget(self.cb)
@@ -85,7 +85,7 @@ class MatrixApp(QMainWindow):
         for t in [self.A, self.B]:
             t.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
             t.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-            t.setMaximumHeight(260)
+            t.setMaximumHeight(200)
 
         row = QHBoxLayout()
         row.addWidget(self.A, stretch=1);
@@ -94,10 +94,8 @@ class MatrixApp(QMainWindow):
         layout.addLayout(row)
 
         btns = QHBoxLayout()
-        ops = [
-            ("A + B", self.mat_add), ("A - B", self.mat_sub),
-            ("A × B", self.mat_mul), ("Определитель(A)", self.mat_det), ("Ранг(A)", self.mat_rank)
-        ]
+        ops = [("A + B", self.mat_add), ("A - B", self.mat_sub), ("A × B", self.mat_mul), ("det(A)", self.mat_det),
+               ("Ранг(A)", self.mat_rank)]
         for name, func in ops:
             btn = QPushButton(name);
             btn.clicked.connect(func);
@@ -117,47 +115,45 @@ class MatrixApp(QMainWindow):
     def mat_add(self):
         A, B = self.M(self.A), self.M(self.B)
         if A is not None and B is not None and A.shape == B.shape:
-            self.out.setText(f"Результат сложения A + B:\n{A + B}")
+            self.out.setText(f"Результат A + B:\n{A + B}")
         else:
-            self.out.setText("❌ Операция невозможна: проверьте размеры (должны совпадать)")
+            self.out.setText("❌ Ошибка: размеры должны совпадать")
 
     def mat_sub(self):
         A, B = self.M(self.A), self.M(self.B)
         if A is not None and B is not None and A.shape == B.shape:
-            self.out.setText(f"Результат вычитания A - B:\n{A - B}")
+            self.out.setText(f"Результат A - B:\n{A - B}")
         else:
-            self.out.setText("❌ Операция невозможна: проверьте размеры (должны совпадать)")
+            self.out.setText("❌ Ошибка: размеры должны совпадать")
 
     def mat_mul(self):
         A, B = self.M(self.A), self.M(self.B)
         if A is not None and B is not None and A.shape[1] == B.shape[0]:
-            self.out.setText(f"Результат умножения A × B:\n{A @ B}")
+            self.out.setText(f"Результат A × B:\n{A @ B}")
         else:
-            self.out.setText("❌ Операция невозможна: число столбцов A должно быть равно числу строк B")
+            self.out.setText("❌ Ошибка: столбцы A != строки B")
 
     def mat_det(self):
         A = self.M(self.A)
         if A is not None and A.shape[0] == A.shape[1]:
-            self.out.setText(f"Определитель матрицы A: {round(np.linalg.det(A), 4)}")
+            self.out.setText(f"Определитель A: {round(np.linalg.det(A), 4)}")
         else:
-            self.out.setText("❌ Операция невозможна: матрица должна быть квадратной")
+            self.out.setText("❌ Ошибка: матрица не квадратная")
 
     def mat_rank(self):
         A = self.M(self.A)
-        if A is not None: self.out.setText(f"Ранг матрицы A: {np.linalg.matrix_rank(A)}")
+        if A is not None: self.out.setText(f"Ранг A: {np.linalg.matrix_rank(A)}")
 
     # ================= ВКЛАДКА: СЛАУ =================
     def init_slau_tab(self):
-        tab = QWidget()
+        tab = QWidget();
         self.tabs.addTab(tab, "СЛАУ")
         layout = QVBoxLayout(tab)
-
         self.n_slau = QLineEdit("3");
         self.n_slau.setFixedWidth(50);
         self.n_slau.textChanged.connect(self.update_slau)
         layout.addWidget(QLabel("Количество неизвестных n:"));
         layout.addWidget(self.n_slau)
-
         self.SA = QTableWidget(3, 3);
         self.SB = QTableWidget(3, 1)
         row = QHBoxLayout();
@@ -165,16 +161,14 @@ class MatrixApp(QMainWindow):
         row.addWidget(QLabel("="));
         row.addWidget(self.SB)
         layout.addLayout(row)
-
         btns = QHBoxLayout()
-        btn2 = QPushButton("Метод Крамера");
-        btn2.clicked.connect(self.solve_cramer)
-        btn3 = QPushButton("Метод Гаусса (Символьный)");
-        btn3.clicked.connect(self.solve_gauss)
-        btns.addWidget(btn2)
-        btns.addWidget(btn3)
+        btn_cr = QPushButton("Метод Крамера");
+        btn_cr.clicked.connect(self.solve_cramer)
+        btn_gs = QPushButton("Метод Гаусса (Символьный)");
+        btn_gs.clicked.connect(self.solve_gauss)
+        btns.addWidget(btn_cr);
+        btns.addWidget(btn_gs)
         layout.addLayout(btns)
-
         self.out_s = QTextEdit();
         layout.addWidget(self.out_s)
 
@@ -189,127 +183,91 @@ class MatrixApp(QMainWindow):
         if A is None or B is None: return
         det_A = np.linalg.det(A)
         if abs(det_A) < 1e-9:
-            self.out_s.setText("❌ Метод Крамера неприменим: определитель равен 0 (система вырождена)")
+            self.out_s.setText("❌ Ошибка: det = 0")
             return
-        res = []
-        for i in range(len(A)):
-            Ai = A.copy();
-            Ai[:, i] = B.flatten()
-            res.append(np.linalg.det(Ai) / det_A)
-
-        output = f"Метод Крамера:\nОпределитель Δ = {round(det_A, 4)}\n"
-        for i, val in enumerate(res):
-            output += f"x{i + 1} = {round(val, 4)}\n"
-        self.out_s.setText(output)
+        res = [np.linalg.det(np.column_stack([A[:, :i], B, A[:, i + 1:]])) / det_A for i in range(len(A))]
+        self.out_s.setText("Метод Крамера:\n" + "\n".join([f"x{i + 1} = {round(v, 4)}" for i, v in enumerate(res)]))
 
     def solve_gauss(self):
         A_num, B_num = self.M(self.SA), self.M(self.SB)
         if A_num is None or B_num is None: return
-
-        n = A_num.shape[0]
+        n = A_num.shape[0];
         xs = sympy.symbols(f'x1:{n + 1}')
-        A_sym = sympy.Matrix(A_num)
-        B_sym = sympy.Matrix(B_num)
-
-        system = []
-        for i in range(n):
-            equation = sympy.Eq(sum(A_sym[i, j] * xs[j] for j in range(n)), B_sym[i])
-            system.append(equation)
-
+        system = [sympy.Eq(sum(A_num[i, j] * xs[j] for j in range(n)), B_num[i]) for i in range(n)]
         try:
-            solution = sympy.solve(system, xs)
-
-            if not solution:
-                self.out_s.setText("❌ Система несовместна (решений нет)")
-                return
-
-            output = "--- Результат (Зависимости переменных) ---\n"
-
-            if isinstance(solution, dict):
-                for i, x in enumerate(xs):
-                    if x in solution:
-                        res = sympy.simplify(solution[x])
-                        output += f"{x} = {res}\n"
-                    else:
-                        output += f"{x} = {x} (свободный коэффициент)\n"
+            sol = sympy.solve(system, xs)
+            if not sol: self.out_s.setText("❌ Решений нет"); return
+            out = "--- Зависимости переменных ---\n"
+            if isinstance(sol, dict):
+                for x in xs: out += f"{x} = {sympy.simplify(sol[x]) if x in sol else str(x) + ' (свободный)'}\n"
             else:
-                output += f"Решение: {solution}"
-
-            self.out_s.setText(output.replace('**', '^'))
-
+                out += f"Решение: {sol}"
+            self.out_s.setText(out.replace('**', '^'))
         except Exception as e:
-            self.out_s.setText(f"❌ Ошибка вычисления: {str(e)}")
+            self.out_s.setText(f"❌ Ошибка: {e}")
 
     # ================= ВКЛАДКА: ВЕКТОРЫ =================
     def init_vector_tab(self):
-        tab = QWidget()
+        tab = QWidget();
         self.tabs.addTab(tab, "Векторы")
         layout = QVBoxLayout(tab)
-
         self.VA = QTableWidget(1, 3);
-        self.VB = QTableWidget(1, 3)
-
-        for t in [self.VA, self.VB]:
+        self.VB = QTableWidget(1, 3);
+        self.VC = QTableWidget(1, 3)
+        for t in [self.VA, self.VB, self.VC]:
             t.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
-            t.setFixedHeight(60)
+            t.setFixedHeight(50)
 
-        layout.addWidget(QLabel("Координаты вектора A (x, y, z):"))
+        layout.addWidget(QLabel("Вектор A:"));
         layout.addWidget(self.VA)
-        layout.addWidget(QLabel("Координаты вектора B (x, y, z):"))
+        layout.addWidget(QLabel("Вектор B:"));
         layout.addWidget(self.VB)
+        layout.addWidget(QLabel("Вектор C (для смешанного произв.):"));
+        layout.addWidget(self.VC)
 
         btns = QHBoxLayout()
-        ops = [
-            ("A + B", 'add'),
-            ("Скалярное (dot)", 'dot'),
-            ("Векторное (cross)", 'cross'),
-            ("Угол между ними", 'angle')
-        ]
+        ops = [("A + B", 'add'), ("Скалярное (A·B)", 'dot'), ("Векторное (AxB)", 'cross'), ("Смешанное (ABC)", 'mixed'),
+               ("Угол (A,B)", 'angle')]
         for n, op in ops:
             b = QPushButton(n);
             b.clicked.connect(lambda _, o=op: self.vec_calc(o));
             btns.addWidget(b)
         layout.addLayout(btns)
-
         self.out_v = QTextEdit();
         layout.addWidget(self.out_v)
 
     def vec_calc(self, op):
         self.fill_zeros(self.VA);
-        self.fill_zeros(self.VB)
+        self.fill_zeros(self.VB);
+        self.fill_zeros(self.VC)
         try:
             a = np.array([float(self.VA.item(0, i).text().replace(',', '.')) for i in range(3)])
             b = np.array([float(self.VB.item(0, i).text().replace(',', '.')) for i in range(3)])
+            c = np.array([float(self.VC.item(0, i).text().replace(',', '.')) for i in range(3)])
 
             if op == 'add':
-                self.out_v.setText(f"Сумма векторов A + B:\n{a + b}")
+                self.out_v.setText(f"A + B = {a + b}")
             elif op == 'dot':
-                self.out_v.setText(f"Скалярное произведение (A · B): {np.dot(a, b)}")
+                self.out_v.setText(f"A · B = {np.dot(a, b)}")
             elif op == 'cross':
-                self.out_v.setText(f"Векторное произведение (A × B):\n{np.cross(a, b)}")
+                self.out_v.setText(f"A × B = {np.cross(a, b)}")
+            elif op == 'mixed':
+                # Смешанное произведение: det([a, b, c])
+                res = np.dot(a, np.cross(b, c))
+                self.out_v.setText(f"Смешанное произведение (ABC) = {round(res, 4)}")
             elif op == 'angle':
-                norm_a = np.linalg.norm(a)
-                norm_b = np.linalg.norm(b)
-                if norm_a == 0 or norm_b == 0:
-                    self.out_v.setText("❌ Нельзя вычислить угол с нулевым вектором")
-                else:
-                    cos_theta = np.dot(a, b) / (norm_a * norm_b)
-                    # Ограничиваем значение для точности из-за погрешностей float
-                    cos_theta = np.clip(cos_theta, -1.0, 1.0)
-                    angle_rad = np.arccos(cos_theta)
-                    angle_deg = np.degrees(angle_rad)
-                    self.out_v.setText(
-                        f"Угол между векторами:\nРадианы: {round(angle_rad, 4)}\nГрадусы: {round(angle_deg, 2)}°")
+                cos_t = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+                angle = np.degrees(np.arccos(np.clip(cos_t, -1, 1)))
+                self.out_v.setText(f"Угол: {round(angle, 2)}°")
         except Exception as e:
-            self.out_v.setText(f"❌ Ошибка данных: {str(e)}")
+            self.out_v.setText(f"❌ Ошибка: {e}")
 
     # ================= ПРОЧЕЕ =================
     def init_eigen_tab(self):
         tab = QWidget();
         self.tabs.addTab(tab, "Собств. числа")
-        layout = QVBoxLayout(tab)
-        layout.addWidget(QLabel("Анализ матрицы A (из первой вкладки):"))
-        btn = QPushButton("Найти собственные значения и векторы");
+        layout = QVBoxLayout(tab);
+        btn = QPushButton("Найти собств. значения A");
         btn.clicked.connect(self.eigen)
         layout.addWidget(btn);
         self.eigen_out = QTextEdit();
@@ -318,22 +276,16 @@ class MatrixApp(QMainWindow):
     def eigen(self):
         A = self.M(self.A)
         if A is not None and A.shape[0] == A.shape[1]:
-            try:
-                vals, vecs = np.linalg.eig(A)
-                res = "Собственные значения:\n" + str(vals)
-                res += "\n\nСобственные векторы (по столбцам):\n" + str(vecs)
-                self.eigen_out.setText(res)
-            except Exception as e:
-                self.eigen_out.setText(f"❌ Ошибка вычисления: {str(e)}")
+            v, vec = np.linalg.eig(A);
+            self.eigen_out.setText(f"Числа: {v}\n\nВекторы:\n{vec}")
         else:
-            self.eigen_out.setText("❌ Операция невозможна: матрица должна быть квадратной")
+            self.eigen_out.setText("❌ Ошибка: нужна квадратная матрица A")
 
     def init_vector_geometry_tab(self):
         tab = QWidget();
         self.tabs.addTab(tab, "Проекция")
-        layout = QVBoxLayout(tab)
-        layout.addWidget(QLabel("Проекция вектора A на вектор B (координаты из вкладки 'Векторы'):"))
-        btn = QPushButton("Вычислить вектор проекции");
+        layout = QVBoxLayout(tab);
+        btn = QPushButton("Проекция A на B");
         btn.clicked.connect(self.proj)
         layout.addWidget(btn);
         self.geo_out = QTextEdit();
@@ -342,21 +294,15 @@ class MatrixApp(QMainWindow):
     def proj(self):
         self.fill_zeros(self.VA);
         self.fill_zeros(self.VB)
-        try:
-            a = np.array([float(self.VA.item(0, i).text().replace(',', '.')) for i in range(3)])
-            b = np.array([float(self.VB.item(0, i).text().replace(',', '.')) for i in range(3)])
-            d = np.dot(b, b)
-            if d != 0:
-                projection = (np.dot(a, b) / d) * b
-                self.geo_out.setText(f"Вектор проекции Pr_b(A):\n{projection}")
-            else:
-                self.geo_out.setText("❌ Операция невозможна: B — нулевой вектор")
-        except:
-            self.geo_out.setText("❌ Ошибка ввода данных")
+        a, b = self.M(self.VA)[0], self.M(self.VB)[0]
+        if np.dot(b, b) != 0:
+            self.geo_out.setText(f"Проекция: {(np.dot(a, b) / np.dot(b, b)) * b}")
+        else:
+            self.geo_out.setText("❌ Ошибка: B=0")
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    win = MatrixApp()
-    win.show()
+    app = QApplication(sys.argv);
+    win = MatrixApp();
+    win.show();
     sys.exit(app.exec())
